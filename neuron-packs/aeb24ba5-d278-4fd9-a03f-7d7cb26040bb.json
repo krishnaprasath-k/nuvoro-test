@@ -1,0 +1,679 @@
+{
+  "id": "aeb24ba5-d278-4fd9-a03f-7d7cb26040bb",
+  "name": "Test pack",
+  "neurons": [
+    {
+      "id": "383d3c6e-46f9-4bbb-806b-3a3de17020f4",
+      "name": "Test",
+      "description": "",
+      "neuron_type": "interactive",
+      "topology_profile": null,
+      "cells": [
+        {
+          "id": "cell_1778869392267_0",
+          "type": "compute_transform",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object",
+              "required": [
+                "raw_data"
+              ],
+              "properties": {
+                "raw_data": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "config": {
+            "user_code": "result = {\"transformed_data\": payload.raw_data}",
+            "timeout_ms": 200,
+            "max_memory_mb": 200
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object",
+              "required": [
+                "transformed_data"
+              ],
+              "properties": {
+                "transformed_data": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Compute Transform",
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 253.0,
+              "y": 453.5
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "4a917df4-1f0a-de1c-6966-a95d030e9734",
+          "type": "compute_cryptography",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object",
+              "required": [
+                "transformed_data"
+              ],
+              "properties": {
+                "transformed_data": {
+                  "type": "object",
+                  "required": [
+                    "payload",
+                    "action"
+                  ],
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "hash",
+                        "passthrough"
+                      ],
+                      "type": "string"
+                    },
+                    "payload": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "config": {
+            "user_code": "import hashlib\naction = payload.transformed_data.action\nraw = payload.transformed_data.payload\nif action == 'hash':\n      result = {\"processed_payload\": hashlib.sha256(raw.encode()).hexdigest(), \"zeroize_confirmation\": True}\nelse:\n      result = {\"processed_payload\": raw, \"zeroize_confirmation\": True}",
+            "timeout_ms": 5000,
+            "max_memory_mb": 20,
+            "zeroize_on_completion": true
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object",
+              "required": [
+                "processed_payload",
+                "zeroize_confirmation"
+              ],
+              "properties": {
+                "processed_payload": {
+                  "type": "string"
+                },
+                "zeroize_confirmation": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": null,
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 216.20703125,
+              "y": 482.62109375
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "84116364-6f22-9b5f-92f9-1dd4874e3504",
+          "type": "compute_inference",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "operation": {
+              "body": {
+                "model": "claude-haiku-4-5",
+                "system": "You are a classifier. Reply only with valid JSON.",
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Classify this ticket: 'My order has not arrived after 10 days'. Return JSON: {\"category\": \"...\", \"urgency\": \"low|medium|high\"}"
+                  }
+                ],
+                "max_tokens": 256
+              },
+              "method": "POST"
+            },
+            "connection": {
+              "url": "https://api.anthropic.com/v1/messages",
+              "auth": {
+                "key": "{{REDACTED}}",
+                "type": "api_key",
+                "header": "x-api-key"
+              },
+              "headers": {
+                "anthropic-version": "2023-06-01"
+              },
+              "protocol": "http",
+              "timeout_ms": 30000
+            },
+            "timeout_ms": 2000,
+            "max_retries": 0,
+            "max_memory_mb": 200,
+            "retry_backoff_ms": 0
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object",
+              "required": [
+                "structured_response",
+                "token_usage"
+              ],
+              "properties": {
+                "token_usage": {
+                  "type": "object",
+                  "properties": {
+                    "input_tokens": {
+                      "type": "integer"
+                    },
+                    "output_tokens": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "structured_response": {
+                  "type": "object",
+                  "properties": {
+                    "urgency": {
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high"
+                      ],
+                      "type": "string"
+                    },
+                    "category": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": null,
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 733.76157525,
+              "y": 509.5212045
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "f6899a77-d4d5-1a9d-19d4-197aff09fa3f",
+          "type": "compute_batch_accelerated",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "parameters": {},
+              "dataset_uri": "s3://my-bucket/dataset.csv",
+              "hyperparams": {
+                "lr": 0.001,
+                "epochs": 10
+              }
+            }
+          },
+          "config": {
+            "user_code": "dataset_uri = payload.dataset_uri\nhyperparams = payload.hyperparams or {}\n\n  # your batch processing logic here\n\nresult = {\n      \"artifact_uri\": dataset_uri + \".output\",\n      \"compute_metrics\": {\n          \"status\": \"ok\",\n          \"rows_processed\": 1000,\n          \"duration_ms\": 500\n      }\n  }",
+            "timeout_ms": 500,
+            "max_memory_mb": 128,
+            "max_batch_size": 10000,
+            "heartbeat_interval_ms": 30000
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "artifact_uri": "s3://my-bucket/dataset.csv.output",
+              "compute_metrics": {
+                "status": "ok",
+                "rows_processed": 1000
+              }
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": null,
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 520.9351805,
+              "y": 287.51471575
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "bfb6133a-2193-03f7-0b8d-391610bd0b20",
+          "type": "io_http",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object",
+              "required": [
+                "endpoint",
+                "method"
+              ],
+              "properties": {
+                "body": {
+                  "type": "object"
+                },
+                "method": {
+                  "enum": [
+                    "GET",
+                    "POST",
+                    "PUT",
+                    "DELETE",
+                    "PATCH"
+                  ],
+                  "type": "string"
+                },
+                "headers": {
+                  "type": "object"
+                },
+                "endpoint": {
+                  "type": "string"
+                },
+                "parameters": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "config": {
+            "operation": {
+              "body": {
+                "test": "nuvoro_io_http",
+                "value": 42
+              },
+              "path": "",
+              "query": {},
+              "method": "POST"
+            },
+            "connection": {
+              "url": "https://httpbin.org/post",
+              "auth": {
+                "type": "none"
+              },
+              "protocol": "http",
+              "timeout_ms": 30005
+            },
+            "timeout_ms": 30000,
+            "max_retries": 3,
+            "max_memory_mb": 128,
+            "retry_backoff_ms": 500
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object",
+              "required": [
+                "status_code"
+              ],
+              "properties": {
+                "status_code": {
+                  "type": "integer"
+                },
+                "response_body": {},
+                "response_headers": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": null,
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 717.552368,
+              "y": 299.5576845
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "7f3197bf-58ba-3a29-84aa-02f6b2cb8b34",
+          "type": "io_rpc",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "operation": {
+              "body": {
+                "id": 1,
+                "method": "eth_blockNumber",
+                "params": [],
+                "jsonrpc": "2.0"
+              },
+              "method": "POST"
+            },
+            "connection": {
+              "url": "https://ethereum-rpc.publicnode.com",
+              "auth": {
+                "type": "none"
+              },
+              "protocol": "http",
+              "timeout_ms": 10000
+            },
+            "timeout_ms": 30000,
+            "max_retries": 3,
+            "max_memory_mb": 128,
+            "retry_backoff_ms": 500
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object",
+              "properties": {
+                "status_code": {
+                  "type": "integer"
+                },
+                "response_body": {
+                  "type": "object"
+                },
+                "response_headers": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": null,
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 421.61006375,
+              "y": 638.0062634999999
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "a0ac1bb3-fcc0-84e4-1b96-fce44425af62",
+          "type": "io_websocket",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "operation": {
+              "action": "send",
+              "payload": {
+                "ping": "nuvoro_ws_test"
+              }
+            },
+            "connection": {
+              "url": "wss://ws.postman-echo.com/raw",
+              "protocol": "websocket",
+              "timeout_ms": 2000,
+              "max_messages": 5
+            },
+            "timeout_ms": 30000,
+            "max_memory_mb": 128
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object",
+              "properties": {
+                "connection_status": {
+                  "type": "string"
+                },
+                "aggregated_messages_array": {
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": null,
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 582.8561575,
+              "y": 575.5453259999999
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "e8e8c2a2-fa79-c2ae-381a-627ff3d6465f",
+          "type": "io_browser_automation",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "operation": {
+              "body": {
+                "url": "https://github.com",
+                "elements": [
+                  {
+                    "selector": "h1"
+                  }
+                ]
+              },
+              "method": "POST"
+            },
+            "connection": {
+              "url": "https://production-sfo.browserless.io/scrape?token=2UWNAV717eSYFad4977710b1069b923ff63010ea0e0991427",
+              "auth": {
+                "type": "none"
+              },
+              "protocol": "http",
+              "timeout_ms": 30000
+            },
+            "timeout_ms": 30000,
+            "max_retries": 2,
+            "max_memory_mb": 128
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object",
+              "properties": {
+                "status_code": {
+                  "type": "integer"
+                },
+                "response_body": {},
+                "response_headers": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": null,
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 451.57490774999997,
+              "y": 410.6156385
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "74e8c9cf-fe3d-9fe0-aca5-660fef84bcbb",
+          "type": "io_system_exec",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "user_code": "echo \"hello from nuvoro\"",
+            "timeout_ms": 30000,
+            "max_retries": 0,
+            "max_memory_mb": 128,
+            "retry_backoff_ms": 1000,
+            "max_output_size_kb": 1024
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object",
+              "properties": {
+                "stderr": {
+                  "type": "string"
+                },
+                "stdout": {
+                  "type": "string"
+                },
+                "exit_code": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": null,
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 602.24678275,
+              "y": 464.08048225
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        }
+      ],
+      "connections": [
+        {
+          "mapping": {
+            "$": "$"
+          },
+          "to_cell": "4a917df4-1f0a-de1c-6966-a95d030e9734",
+          "to_port": null,
+          "from_cell": "cell_1778869392267_0",
+          "from_port": null
+        }
+      ]
+    }
+  ]
+}
