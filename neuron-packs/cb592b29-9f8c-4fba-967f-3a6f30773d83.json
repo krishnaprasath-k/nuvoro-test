@@ -1,0 +1,310 @@
+{
+  "id": "cb592b29-9f8c-4fba-967f-3a6f30773d83",
+  "name": "daily_churn_risk_pipeline",
+  "neurons": [
+    {
+      "id": "6fe69533-2a0a-4977-b0c4-e0dc159c1c1a",
+      "name": "daily_churn_risk_pipeline",
+      "description": "",
+      "neuron_type": "interactive",
+      "topology_profile": "durable_suspension",
+      "cells": [
+        {
+          "id": "c3",
+          "type": "state_branch",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "true_port": "high_risk",
+            "false_port": "low_risk",
+            "condition_expression": "payload['is_high_risk'] == True"
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "High Risk or Low Risk?",
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 351,
+              "y": 567
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "c4",
+          "type": "io_http",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {}
+          },
+          "config": {
+            "operation": {
+              "body": {
+                "channel": "sales_team",
+                "alert_type": "churn_risk_high",
+                "risk_score": "${payload.risk_score}",
+                "customer_id": "${payload.customer_id}",
+                "model_version": "${payload.model_version}",
+                "action_required": "Contact customer within 24 hours"
+              },
+              "method": "POST"
+            },
+            "connection": {
+              "url": "https://httpbin.org/post",
+              "auth": {
+                "type": "none"
+              },
+              "protocol": "http"
+            },
+            "timeout_ms": 15000,
+            "max_retries": 2,
+            "max_memory_mb": 128,
+            "retry_backoff_ms": 1000
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Alert Sales Team",
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 604,
+              "y": 331
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "c5",
+          "type": "io_database_sql",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {}
+          },
+          "config": {
+            "operation": {
+              "body": {
+                "event": "churn_score_logged",
+                "risk_score": "${payload.risk_score}",
+                "customer_id": "${payload.customer_id}",
+                "model_version": "${payload.model_version}",
+                "classification": "low_risk"
+              },
+              "method": "POST"
+            },
+            "connection": {
+              "url": "https://dsvgqzciockqetombswk.supabase.co/rest/v1/churn_predictions?select=*&limit=10",
+              "auth": {
+                "key": "{{REDACTED}}",
+                "type": "api_key",
+                "header": "apikey"
+              },
+              "protocol": "http"
+            },
+            "timeout_ms": 30000,
+            "max_retries": 3,
+            "max_memory_mb": 256,
+            "retry_backoff_ms": 500
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Log Low Risk Result",
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 665,
+              "y": 564
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "c6",
+          "type": "io_http",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {}
+          },
+          "config": {
+            "operation": {
+              "body": {
+                "text": "Daily churn risk pipeline complete. Customer ${payload.customer_id} processed. Final classification recorded.",
+                "channel": "#daily-ops"
+              },
+              "method": "POST"
+            },
+            "connection": {
+              "url": "https://httpbin.org/post",
+              "auth": {
+                "type": "none"
+              },
+              "protocol": "http"
+            },
+            "timeout_ms": 15000,
+            "max_retries": 2,
+            "max_memory_mb": 128,
+            "retry_backoff_ms": 1000
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Send Daily Summary to Slack",
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 1040,
+              "y": 473
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "0857659f-54d9-0eda-5670-ad7a6a4a37a6",
+          "type": "compute_transform",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {}
+          },
+          "config": {
+            "user_code": "rows = payload.response_body if hasattr(payload, 'response_body') else []\nfirst_row = rows[0] if rows else {}\n\ndef get_field(obj, key, default=None):\n    if isinstance(obj, dict):\n        return obj.get(key, default)\n    return getattr(obj, key, default)\n\nresult = {\n    'customer_id': get_field(first_row, 'customer_id', 'unknown'),\n    'risk_score': float(get_field(first_row, 'risk_score', 0) or 0),\n    'is_high_risk': bool(get_field(first_row, 'is_high_risk', False)),\n    'classification': get_field(first_row, 'classification', 'unknown'),\n    'model_version': get_field(first_row, 'model_version', 'rf_v1'),\n    'scored_at': '2026-06-05T05:55:00Z'\n}",
+            "timeout_ms": 5000,
+            "max_memory_mb": 128
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Compute Transform",
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 179,
+              "y": 473
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        }
+      ],
+      "connections": [
+        {
+          "mapping": {
+            "$": "$"
+          },
+          "to_cell": "c5",
+          "from_cell": "c4"
+        },
+        {
+          "mapping": {
+            "$": "$"
+          },
+          "to_cell": "c6",
+          "from_cell": "c5"
+        },
+        {
+          "mapping": {
+            "$": "$"
+          },
+          "to_cell": "c3",
+          "from_cell": "0857659f-54d9-0eda-5670-ad7a6a4a37a6"
+        },
+        {
+          "mapping": {
+            "$": "$"
+          },
+          "to_cell": "c4",
+          "from_cell": "c3",
+          "branch_port": "high_risk"
+        },
+        {
+          "mapping": {
+            "$": "$"
+          },
+          "to_cell": "c5",
+          "from_cell": "c3",
+          "branch_port": "low_risk"
+        }
+      ]
+    }
+  ]
+}
