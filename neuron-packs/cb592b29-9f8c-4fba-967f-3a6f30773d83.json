@@ -305,6 +305,239 @@
           "branch_port": "low_risk"
         }
       ]
+    },
+    {
+      "id": "ee1dbc0c-0292-45e2-9068-0c8445e66e1b",
+      "name": "dev-s-v1",
+      "description": "",
+      "neuron_type": "interactive",
+      "topology_profile": null,
+      "cells": [
+        {
+          "id": "cell_1781532203869_0",
+          "type": "compute_transform",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {}
+          },
+          "config": {
+            "user_code": "print(\"helloworld\")",
+            "timeout_ms": 30000,
+            "max_memory_mb": 239
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Compute Transform",
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 597,
+              "y": 416
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "2336f702-6318-649e-14bd-509cef410446",
+          "type": "compute_transform",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "user_code": "data = payload.raw_data\n\nresult = {k: v.upper() for k, v in data.items() if isinstance(v, str)}",
+            "timeout_ms": 30000,
+            "max_memory_mb": 128
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Compute Transform2",
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 1018,
+              "y": 438
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "b0640b18-1da3-c06f-e1bf-f3312e5b3a23",
+          "type": "compute_transform",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "user_code": "data = payload.raw_data\n\nresult = {k: v.upper() for k, v in data.items() if isinstance(v, str)}",
+            "timeout_ms": 30000,
+            "max_memory_mb": 128
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Compute Transform",
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 842,
+              "y": 376
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "4a98561c-387c-3be8-d8bd-1b4ddcb10f34",
+          "type": "compute_inference",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "operation": {
+              "body": {
+                "contents": [
+                  {
+                    "role": "user",
+                    "parts": [
+                      {
+                        "text": "Extract fields from the attached invoice PDF: vendor_name, invoice_number, invoice_date, due_date, currency, net_amount, vat_amount, total_amount, vat_rate, vendor_vat_number. Return ONLY JSON. Document data: {context[0]}"
+                      }
+                    ]
+                  }
+                ],
+                "generationConfig": {
+                  "temperature": 0,
+                  "maxOutputTokens": 1024
+                },
+                "systemInstruction": {
+                  "parts": [
+                    {
+                      "text": "You extract invoice fields from PDF documents. Return JSON only, no markdown."
+                    }
+                  ]
+                }
+              },
+              "method": "POST"
+            },
+            "connection": {
+              "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+              "auth": {
+                "key": "{{REDACTED}}",
+                "type": "api_key",
+                "header": "x-goog-api-key"
+              },
+              "protocol": "http"
+            },
+            "timeout_ms": 90000,
+            "max_retries": 0,
+            "max_memory_mb": 256,
+            "retry_backoff_ms": 1000
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Compute Inference",
+            "enabled": true,
+            "visible": true,
+            "position": {
+              "x": 1238,
+              "y": 438
+            },
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        }
+      ],
+      "connections": [
+        {
+          "mapping": {
+            "$": "$"
+          },
+          "to_cell": "b0640b18-1da3-c06f-e1bf-f3312e5b3a23",
+          "to_port": null,
+          "from_cell": "cell_1781532203869_0",
+          "from_port": null,
+          "branch_port": null
+        },
+        {
+          "mapping": {
+            "$": "$"
+          },
+          "to_cell": "2336f702-6318-649e-14bd-509cef410446",
+          "to_port": null,
+          "from_cell": "b0640b18-1da3-c06f-e1bf-f3312e5b3a23",
+          "from_port": null,
+          "branch_port": null
+        }
+      ]
     }
   ]
 }
