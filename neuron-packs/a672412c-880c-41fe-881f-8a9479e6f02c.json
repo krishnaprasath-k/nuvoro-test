@@ -1,0 +1,157 @@
+{
+  "id": "a672412c-880c-41fe-881f-8a9479e6f02c",
+  "name": "Atomic neuron2",
+  "neurons": [
+    {
+      "id": "f4bbc38e-7e8e-4ff7-9017-7d2a8983a8dd",
+      "name": "Atomic Test2",
+      "description": "",
+      "neuron_type": "interactive",
+      "topology_profile": null,
+      "cells": [
+        {
+          "id": "cell_1781805246363_0",
+          "type": "compute_transform",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "user_code": "data = payload.raw_data\n\nresult = {k: v.upper() for k, v in data.items() if isinstance(v, str)}",
+            "timeout_ms": 30000,
+            "max_memory_mb": 128
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Compute Transform",
+            "enabled": true,
+            "visible": true,
+            "position": null,
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "cell_1781805246363_1",
+          "type": "compute_cryptography",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "action": "hash",
+            "key_ref": null,
+            "encoding": "hex",
+            "algorithm": "sha256",
+            "timeout_ms": 30000,
+            "max_memory_mb": 128,
+            "zeroize_on_completion": true
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Compute Cryptography",
+            "enabled": true,
+            "visible": true,
+            "position": null,
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        },
+        {
+          "id": "cell_1781805246363_2",
+          "type": "compute_inference",
+          "input": {
+            "required": true,
+            "input_type": null,
+            "input_ports": 1,
+            "port_labels": [],
+            "input_schema": {
+              "type": "object"
+            }
+          },
+          "config": {
+            "timeout_ms": 30000,
+            "max_memory_mb": 128
+          },
+          "output": {
+            "output_type": null,
+            "port_labels": [],
+            "output_ports": 1,
+            "output_schema": {
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "icon": null,
+            "name": null,
+            "tags": [],
+            "color": null,
+            "label": "Compute Inference",
+            "enabled": true,
+            "visible": true,
+            "position": null,
+            "description": null
+          },
+          "saved_cell_id": null,
+          "saved_cell_version": null
+        }
+      ],
+      "connections": [
+        {
+          "mapping": {
+            "$": "$"
+          },
+          "to_cell": "cell_1781805246363_1",
+          "to_port": null,
+          "from_cell": "cell_1781805246363_0",
+          "from_port": null,
+          "branch_port": null
+        },
+        {
+          "mapping": {
+            "$": "$"
+          },
+          "to_cell": "cell_1781805246363_2",
+          "to_port": null,
+          "from_cell": "cell_1781805246363_1",
+          "from_port": null,
+          "branch_port": null
+        }
+      ]
+    }
+  ]
+}
